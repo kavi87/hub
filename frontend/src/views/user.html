@@ -50,17 +50,12 @@
                                     <h4>{{ userComponent.summary }}</h4>
                                     <span show-xs hide-gt-xs>{{ userComponent.state }}</span>
                                 </div>
-                                <div layout="row" hide-xs>
+                                <div class="md-list-item-text" layout="row" hide-xs flex layout-align="end center" hide-xs>
                                     <md-icon md-font-set="material-icons" style="margin:5px 10px">change_history
                                     </md-icon>
                                     {{ userComponent.version }}
-                                </div>
-                                <div layout="row" hide-xs>
                                     <md-icon md-font-set="material-icons" style="margin:5px 10px">star_rate</md-icon>
                                     {{ userComponent.stars }}
-                                </div>
-                                <div class="md-list-item-text" layout="row" hide-xs flex layout-align="end center"
-                                     hide-xs>
                                     <md-progress-circular ng-if="userComponent.state === 'PENDING'"
                                                           md-mode="indeterminate"
                                                           class="md-primary">
@@ -88,7 +83,6 @@
                                 <div class="md-list-item-text" layout="column">
                                     <h3>{{ favoriteComponent.name }}</h3>
                                     <h4>{{ favoriteComponent.summary }}</h4>
-
                                     <p>{{ favoriteComponent.version }}</p>
                                 </div>
                             </md-list-item>

@@ -18,12 +18,12 @@ interface IHubSidebarScope extends ng.IScope {
 }
 class HubSidebar implements ng.IDirective {
     static $inject = ['$mdSidenav', '$location', 'EventService', 'AuthenticationService', 'AuthorizationService'];
-    constructor(private $mdSidenav, private $location: ng.ILocationService, private eventService, private authService, private authorizationService) {}
+    constructor(private $mdSidenav, private $location: ng.ILocationService, private eventService, private authenticationService, private authorizationService) {}
     template = sidebarTemplate;
     link: ng.IDirectiveLinkFn = (scope: IHubSidebarScope) => {
 
         this.eventService.on('w20.security.authenticated', () => {
-            scope.userPrincipals = this.authService.subjectPrincipals();
+            scope.userPrincipals = this.authenticationService.subjectPrincipals();
         });
 
         scope.authorizationService = this.authorizationService;

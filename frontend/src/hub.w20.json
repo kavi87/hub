@@ -3,6 +3,25 @@
   "name": "Hub fragment",
 
   "modules": {
+    "toolbar": {
+      "path": "{hub}/modules/directives/toolbar/toolbar",
+      "autoload": true,
+      "configSchema": {
+        "title": "Hub toolbar configuration",
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "logoUrl": {
+            "description": "Toolbar logo URL",
+            "type": "string"
+          },
+          "name": {
+            "description": "Name of the organization to display next to logo",
+            "type": "string"
+          }
+        }
+      }
+    },
     "home": {
       "path": "{hub}/modules/controllers/home",
       "autoload": true
@@ -17,10 +36,6 @@
     },
     "config": {
       "path": "{hub}/modules/config",
-      "autoload": true
-    },
-    "toolbar": {
-      "path": "{hub}/modules/directives/toolbar/toolbar",
       "autoload": true
     },
     "sidebar": {
