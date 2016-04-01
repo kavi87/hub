@@ -20,6 +20,7 @@ import org.seedstack.hub.domain.services.fetch.FetchResult;
 import org.seedstack.hub.domain.services.fetch.FetchService;
 import org.seedstack.seed.Logging;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.io.File;
@@ -33,8 +34,8 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.stream.Stream;
 
 abstract class LocalFetchService implements FetchService {
-    @Logging
-    private Logger logger;
+
+    private static final Logger logger = LoggerFactory.getLogger(LocalFetchService.class);
 
     @Inject
     private ManifestParser manifestParser;

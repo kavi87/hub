@@ -3,6 +3,7 @@ import angular = require('{angular}/angular');
 import _ = require('{lodash}/lodash');
 import IResource = angular.resource.IResource;
 import {GithubService} from "../services/github-service";
+import ILocationService = angular.ILocationService;
 
 enum RepositoryType {
     GIT = <any> 'GIT',
@@ -10,8 +11,8 @@ enum RepositoryType {
 }
 
 interface IRepository {
-    vcs: RepositoryType;
-    url: string;
+    sourceType: RepositoryType;
+    sourceUrl: string;
 }
 
 class ImportComponentController {
@@ -24,16 +25,19 @@ class ImportComponentController {
 class QuickImportController {
     public repositoryTypes:RepositoryType[] = [RepositoryType.GIT, RepositoryType.SVN];
     public repository:IRepository = <any>{};
-    public promise:ng.resource.IResource<any>;
+    public importing: boolean = false;
     public failure:boolean = false;
+    public success:boolean = false;
+    public newComponent: Card;
 
-    static $inject = ['HomeService', '$httpParamSerializer'];
-    constructor(private api, private $httpParamSerializer) {
-        this.repository.vcs = this.repositoryTypes[0];
-        this.repository.url = '';
+    static $inject = ['HomeService', '$httpParamSerializer', '$location'];
+    constructor(private api, private $httpParamSerializer, private $location: ILocationService) {
+        this.repository.sourceType = this.repositoryTypes[0];
+        this.repository.sourceUrl = '';
     };
 
     public confirm(repository:IRepository):void {
+        this.importing = true;
         var action = {
             save: {
                 method: 'POST',
@@ -42,18 +46,30 @@ class QuickImportController {
                 }
             }
         };
-        var formParam = this.$httpParamSerializer({'url': repository.url, 'vcs': repository.vcs});
-        this.promise = this.api('home').enter('components', {}, action).save({}, formParam);
-        this.promise
+        var formParam = this.$httpParamSerializer({'sourceUrl': repository.sourceUrl, 'sourceType': repository.sourceType});
+        this.api('home').enter('components', {}, action).save({}, formParam)
             .$promise
             .then(newComponent => {
-                console.info(JSON.stringify(newComponent));
+                if (newComponent) {
+                    this.success = true;
+                    this.newComponent = newComponent;
+                }
             })
             .catch(reason => {
                 this.failure = true;
                 ImportComponentController.promiseRejected(reason);
             });
     };
+
+    public terminate(): void {
+        this.importing = false;
+        this.success = false;
+        this.failure = false;
+    }
+
+    public view (card: Card): void {
+        this.$location.path('hub/component/' + card.id);
+    }
 }
 
 class GithubImportController {
@@ -85,7 +101,6 @@ class GithubImportController {
         this.importing = false;
     }
 
-
     private toast (message: string) {
         this.$mdToast.show(
             this.$mdToast.simple()
@@ -102,6 +117,10 @@ class GithubImportController {
     }
 
     public importComponents (selectedComponents): void {
+        if (!selectedComponents.length) {
+            this.toast('You did not select any repositories!');
+            return;
+        }
         this.importing = true;
         selectedComponents = GithubImportController.formatGithubRepositories(selectedComponents);
         this.api('home').enter('import_list').save({}, selectedComponents).$promise
@@ -135,7 +154,7 @@ class VcsUrlValidator implements ng.IDirective {
     scope:any = {repository: '='};
     link:ng.IDirectiveLinkFn = (scope:ng.IScope, element:ng.IAugmentedJQuery, attributes:ng.IAttributes, ngModel:ng.INgModelController) => {
         ngModel.$validators['isRepoUrl'] = (modelValue, viewValue) => {
-            switch (scope['repository'].vcs) {
+            switch (scope['repository'].sourceType) {
                 case RepositoryType.GIT:
                     return /(?:git|ssh|https?|git@[\w\.]+):(?:\/\/)?[\w\.@:\/~_-]+\.git(?:\/?|\#[\d\w\.\-_]+?)$/.test(viewValue);
                 default:

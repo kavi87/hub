@@ -16,15 +16,15 @@
     </md-toolbar>
     <md-content class="md-whiteframe-1dp">
         <md-tabs md-dynamic-height md-border-bottom>
-            <md-tab label="Quick import">
+            <md-tab label="Quick">
 
                 <section ng-controller="QuickImportController as $qctrl">
                     <md-content class="md-padding">
-                        <form name="quickImportForm" ng-submit="$qctrl.confirm($ctrl.repository)">
-                            <div layout-gt-xs="row">
+                        <form name="quickImportForm" ng-submit="$qctrl.confirm($qctrl.repository)">
+                            <div layout-gt-xs="row" ng-hide="$qctrl.importing">
                                 <md-input-container class="md-block" flex-gt-xs="20" flex-xs>
                                     <label>Repository type</label>
-                                    <md-select ng-model="$qctrl.repository.vcs">
+                                    <md-select ng-model="$qctrl.repository.sourceType">
                                         <md-optgroup label="Repository type">
                                             <md-option ng-repeat="option in $qctrl.repositoryTypes">{{ option }}</md-option>
                                         </md-optgroup>
@@ -34,7 +34,7 @@
                                     <label for="url">URL</label>
                                     <input id="url"
                                            name="url"
-                                           ng-model="$qctrl.repository.url"
+                                           ng-model="$qctrl.repository.sourceUrl"
                                            type="url"
                                            md-autofocus
                                            required
@@ -47,31 +47,38 @@
                                     </div>
                                 </md-input-container>
                             </div>
-                            <div ng-hide="quickImportForm.$submitted" layout="row">
+                            <div ng-hide="$qctrl.importing" layout="row">
                                 <span flex></span>
                                 <md-button type="submit" class="md-primary" ng-disabled="quickImportForm.$invalid" style="margin-right:20px;">
                                     Add component
                                 </md-button>
                             </div>
-                            <div ng-show="quickImportForm.$submitted && !$qctrl.promise.$resolved" flex layout="row" layout-align="center center">
+                            <div ng-show="$qctrl.importing && ($qctrl.success === $qctrl.failure)" flex layout="row" layout-align="center center">
                                 <md-progress-circular md-diameter="150px" class="md-hue-1t" md-mode="indeterminate"></md-progress-circular>
                                 Hold tight ! Your component is being added.
                             </div>
-                            <div style="min-height: 150px;"
-                                               ng-show="quickImportForm.$submitted && $qctrl.promise.$resolved && $qctrl.failure" flex layout="row"
-                                               layout-align="center center">
+                            <div ng-show="$qctrl.failure"
+                                 flex layout="row"
+                                 style="min-height: 150px;" ng-cloak
+                                 layout-align="center center">
                                 <md-icon style="font-size: 130px; height: 130px; margin: 0 100px" class="material-icons">warning</md-icon>
                                 <p>An error occured. We could not import your component.</p>
+                            </div>
+                            <div ng-cloak ng-show="$qctrl.success" layout="column" layout-align="center center">
+                                <h2 class="md-headline">New component imported !</h2>
+                                <hub-card card="$qctrl.newComponent" on-click="$qctrl.view($qctrl.newComponent)" style="width: 265px;"></hub-card>
+                                <p> Note that your component needs to be published before being visible to others. </p>
+                                <md-button class="md-raised md-primary" ng-click="quickImportForm.$setPristine(); $qctrl.terminate()">OK</md-button>
                             </div>
                         </form>
                     </md-content>
                 </section>
 
             </md-tab>
-            <md-tab label="Github import">
+            <md-tab label="Github">
                 <section ng-controller="GithubImportController as $ctrl">
                     <md-content class="md-padding">
-                        <h1> Github </h1>
+                        <h1> <i class="fa fa-github"></i> Github </h1>
                         <form name="searchGithubForm">
                             <md-input-container class="md-block">
                                 <label for="searchGithub">Enter user to list its public repositories</label>
@@ -150,6 +157,8 @@
                         - docs/integration.md<br>
                         - docs/usage.md<br>
                     </code>
+
+                    <p> Alternatively you can browse a Github user's repositories in the Github tab.</p>
                 </md-content>
             </md-tab>
         </md-tabs>

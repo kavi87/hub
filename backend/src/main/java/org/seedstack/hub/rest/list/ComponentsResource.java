@@ -62,8 +62,8 @@ public class ComponentsResource {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Path("/components")
     public Response post(
-            @FormParam("vcs") @NotBlank @Length(max = 10) String vcs,
-            @FormParam("url") @org.hibernate.validator.constraints.URL @NotBlank String sourceUrl
+            @FormParam("sourceType") @NotBlank @Length(max = 10) String vcs,
+            @FormParam("sourceUrl") @org.hibernate.validator.constraints.URL @NotBlank String sourceUrl
     ) throws URISyntaxException {
         SourceType sourceType;
         try {
