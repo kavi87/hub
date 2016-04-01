@@ -64,13 +64,13 @@ public class OrganisationResource {
         Organisation organisation = new Organisation(new OrganisationId(organisationCard.getId()), organisationCard.getName(), owners);
         organisationRepository.persist(organisation);
         return Response.created(new URI(relRegistry.uri(Rels.ORGANISATION).set(ORGANISATION_ID, organisationCard.getId()).expand()))
-                .entity(getOrganisationCards(organisationCard.getId())).build();
+                .entity(getOrganisation(organisationCard.getId())).build();
     }
 
     @Rel(Rels.ORGANISATION)
     @GET
     @Path("/{organisationId}")
-    public OrganisationRepresentation getOrganisationCards(@PathParam(ORGANISATION_ID) String organisationName) {
+    public OrganisationRepresentation getOrganisation(@PathParam(ORGANISATION_ID) String organisationName) {
         Organisation organisation = organisationRepository.load(new OrganisationId(organisationName));
         if (organisation == null) {
             throw new NotFoundException();

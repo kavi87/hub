@@ -46,6 +46,10 @@
       "path": "{hub}/modules/directives/speed-dial/speed-dial",
       "autoload": true
     },
+    "import-component": {
+      "path": "{hub}/modules/controllers/import-component",
+      "autoload": true
+    },
     "add-component": {
       "path": "{hub}/modules/directives/speed-dial/actions/add-component",
       "autoload": true
@@ -73,6 +77,14 @@
     "administration": {
       "path": "{hub}/modules/controllers/administration",
       "autoload": true
+    },
+    "github-service": {
+      "path": "{hub}/modules/services/github-service",
+      "autoload": true
+    },
+    "font-awesome": {
+      "path": "[css]!{font-awesome}/css/font-awesome.min.css",
+      "autoload": true
     }
   },
 
@@ -89,6 +101,10 @@
     "/components": {
       "templateUrl": "{hub}/views/search.html",
       "controller":"SearchController as $ctrl"
+    },
+    "/import-component": {
+      "templateUrl": "{hub}/views/import-component.html",
+      "controller":"ImportComponentController as $ctrl"
     },
     "/component/:id": {
       "templateUrl":"{hub}/views/component-details.html",
