@@ -11,11 +11,6 @@ import org.seedstack.hub.application.fetch.ImportException;
 import org.seedstack.hub.application.fetch.ImportService;
 import org.seedstack.hub.domain.model.component.Component;
 import org.seedstack.hub.domain.model.component.Source;
-import org.seedstack.hub.rest.component.list.ComponentCard;
-import org.seedstack.hub.rest.component.list.ComponentCardAssembler;
-import org.seedstack.seed.Logging;
-import org.seedstack.seed.rest.Rel;
-import org.seedstack.hub.rest.component.list.ComponentCard;
 import org.seedstack.hub.rest.component.list.ComponentCardAssembler;
 import org.seedstack.seed.Logging;
 import org.seedstack.seed.rest.Rel;
@@ -32,11 +27,12 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 import java.time.Duration;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 import static javax.ws.rs.core.Response.Status.ACCEPTED;
-import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 import static org.seedstack.hub.rest.Rels.IMPORT_LIST;
 
 @Path("/admin")
@@ -58,7 +54,7 @@ public class AdminResource {
     public Response importList(List<Source> sources) {
         long startTime = System.currentTimeMillis();
         final ImportReport importReport = new ImportReport();
-        Executors.newWorkStealingPool().submit(() ->
+        Future<?> future = Executors.newWorkStealingPool().submit(() ->
                 importReport.setComponentCards(
                         sources.parallelStream()
                                 .map(source -> {
@@ -74,14 +70,19 @@ public class AdminResource {
                                 .collect(Collectors.toList())
                 )
         );
-
-        long stopTime = System.currentTimeMillis();
-        logger.info(Duration.ofMillis(stopTime - startTime).toString());
-        ResponseBuilder response;
-        if (importReport.getFailedSources().isEmpty()) {
-            response = Response.ok();
-        } else {
-            response = Response.status(ACCEPTED);
+        ResponseBuilder response = null;
+        try {
+            if (future.get() == null) {
+                long stopTime = System.currentTimeMillis();
+                logger.info(Duration.ofMillis(stopTime - startTime).toString());
+                if (importReport.getFailedSources().isEmpty()) {
+                    response = Response.ok();
+                } else {
+                    response = Response.status(ACCEPTED);
+                }
+            }
+        } catch (InterruptedException | ExecutionException e) {
+            throw new ImportException(e);
         }
         return response.entity(importReport).build();
     }

@@ -16,11 +16,11 @@ enum SubView {
     IDENTITY = <any> 'identity'
 }
 
-function displayDocName() {
+var displayDocName = ['$window', function ($window) {
     return function (input) {
-        return input.split('/').pop();
+        return  $window.decodeURIComponent(input).split('/').pop();
     };
-}
+}];
 
 class ComponentDetailsController {
     public component:any;
@@ -159,7 +159,7 @@ class ComponentDetailsController {
 
     public decodeURIComponent = this.$window.decodeURIComponent;
 
-    public openWikiCreation(wiki): void {
+    public openWiki(wiki): void {
         this.$mdDialog.show({
             controller: 'WikiEditorController',
             controllerAs: '$ctrl',
@@ -175,7 +175,7 @@ class ComponentDetailsController {
     }
 
     public editWiki(wiki: string): void {
-        this.openWikiCreation(wiki);
+        this.openWiki(wiki);
     }
 
     public setActiveWiki(wiki:string):void {
