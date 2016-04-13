@@ -5,13 +5,25 @@ import IResource = angular.resource.IResource;
 class UserUpdateController {
     public user:any;
     public fileUploadSuccess:any;
-    public fileUploadFailure:any;
     public fileUploadProgress:number;
 
-    static $inject = ['HomeService', '$location', 'AuthenticationService', 'Upload', '$timeout'];
+    static $inject = [
+        'HomeService',
+        '$location',
+        'AuthenticationService',
+        'Upload',
+        '$timeout',
+        '$mdDialog',
+        '$route'
+    ];
 
-
-    constructor(private api, private $location, private authService, private fileUpload, private $timeout) {
+    constructor(private api,
+                private $location,
+                private authService,
+                private fileUpload,
+                private $timeout,
+                private $mdDialog,
+                private $route) {
 
         this.getUser().$promise
             .then((user:any) => {
@@ -31,17 +43,23 @@ class UserUpdateController {
     }
 
     public uploadIcon(dataUrl, name) {
-        this.fileUpload({
-            url: '',
+        this.fileUpload.upload({
+            url: this.user._links['users/icon'].href,
             data: {
-                file: this.fileUpload.dataUrltoBlob(dataUrl, name)
-            }
+                file: this.fileUpload.dataUrltoBlob(dataUrl, name),
+            },
+            method: 'PUT'
         }).then(response => {
-            this.$timeout(() => {
-                this.fileUploadSuccess = response.data;
-            });
+            this.$route.reload();
         }, rejected => {
-            this.fileUploadFailure = rejected;
+            this.$mdDialog.show(
+                this.$mdDialog.alert()
+                    .clickOutsideToClose(true)
+                    .title('Oops !')
+                    .textContent('An error has occured. Please try again later')
+                    .ariaLabel('Icon upload failure')
+                    .ok('Ok')
+            );
             UserUpdateController.promiseRejected(rejected);
         }, evt => {
             this.fileUploadProgress = parseInt(100.0 * evt.loaded / evt.total);

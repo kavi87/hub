@@ -20,7 +20,7 @@
             </md-toolbar>
             <md-content layout-padding style="min-height: 85px; overflow-x: hidden; margin-top: 65px;">
                 <form name="profileUpdateForm" ng-submit="$ctrl.uploadIcon(croppedDataUrl, picFile.name)">
-                    <md-button class="md-raised" ngf-select ng-model="picFile" accept="image/*">Select icon</md-button>
+                    <md-button class="md-raised" ng-click="$ctrl.fileUploadSuccess = null" ngf-select ng-model="picFile" accept="image/*">Select icon</md-button>
                     <md-card style="max-width: 330px" ng-show="picFile">
                         <md-card-title>
                             <md-card-title-media style="width: 100%;">
@@ -30,12 +30,10 @@
                             </md-card-title-media>
                         </md-card-title>
                         <md-card-actions layout="row" layout-align="end center">
-                            <md-button type="submit">Submit</md-button>
+                            <md-button type="submit" ng-show="!$ctrl.fileUploadProgress">Submit</md-button>
                         </md-card-actions>
                     </md-card>
-                    <md-progress-circular ng-show="$ctrl.fileUploadProgress >= 0" md-mode="determinate" value="{{ $ctrl.fileUploadProgress }}"></md-progress-circular>
-                    <span ng-show="$ctrl.fileUploadSuccess">Upload Successful</span>
-                    <span ng-show="$ctrl.fileUploadFailure">{{ $ctrl.fileUploadFailure }}</span>
+                    <md-progress-circular ng-show="$ctrl.fileUploadProgress >= 0" md-diameter="20px" md-mode="determinate" value="{{ $ctrl.fileUploadProgress }}"></md-progress-circular>
                 </form>
             </md-content>
         </md-content>

@@ -112,7 +112,8 @@
     },
     "/component/:id": {
       "templateUrl":"{hub}/views/component-details.html",
-      "controller":"ComponentDetailsController as $ctrl"
+      "controller":"ComponentDetailsController as $ctrl",
+      "reloadOnSearch": false
     },
     "/user/:id": {
       "templateUrl":"{hub}/views/user.html",
